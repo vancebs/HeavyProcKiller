@@ -1,1 +1,3 @@
-HeavyProcKiller 
+#HeavyProcKiller
+
+我发现石头Rom在天猫魔盒上会存在同时出现3个app_process进程并严重占用CPU的情况。本应用通过周期性(3分钟)检查进程状态，杀死占用CPU过高的app_process进程来解决该问题。 
