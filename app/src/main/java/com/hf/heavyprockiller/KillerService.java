@@ -7,15 +7,15 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.Toast;
 
 
 /**
  * Created by Fan on 2016/1/23.
+ *
+ * Killer Service
  */
 public class KillerService extends Service {
-    public static final String TAG = "KillerService";
     public static final String ACTION_KILL = "com.hf.heavyprocesskiller.CHECK_AND_KILL";
     public static final long DURATION = 30 * 60 * 1000; // 30 mins
 
@@ -35,7 +35,7 @@ public class KillerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
-            return super.onStartCommand(intent, flags, startId);
+            return super.onStartCommand(null, flags, startId);
         }
         if (ACTION_KILL.equals(intent.getAction())) {
             mHandler.post(new Runnable() {
@@ -56,7 +56,7 @@ public class KillerService extends Service {
             Toast.makeText(this, "" + count + " proceses killed.", Toast.LENGTH_SHORT).show();
         }
 
-        Log.i(TAG, "onStartCommand()# " + count + " processes killed.");
+        Log.i("" + count + " processes killed.");
 
         // next kill
         nextKill();
