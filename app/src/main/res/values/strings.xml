@@ -4,4 +4,5 @@
     <string name="button_kill">Kill</string>
     <string name="button_refresh">Refresh</string>
     <string name="button_refreshing">Refreshing ...</string>
+    <string name="invalid_process">&lt;Invalid Process&gt;</string>
 </resources>

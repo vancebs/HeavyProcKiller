@@ -1,14 +1,6 @@
 package com.hf.heavyprockiller;
 
-import android.os.SystemClock;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -96,78 +88,5 @@ public class Proc {
     @SuppressWarnings("unused")
     public String get(String key) {
         return mMap.get(key);
-    }
-
-    public boolean kill() {
-        try {
-            Process proc = Runtime.getRuntime().exec("su -c kill " + mMap.get(KEY_PID));
-            int code = proc.waitFor();
-            Log.i("name: " + getName() + ", killed: " + (code == 0) + " (" + code + ")");
-            return code == 0;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public static boolean kill(Proc proc) {
-        return (proc == null) ? false : proc.kill();
-    }
-
-    public static List<Proc> top() {
-        Process proc;
-        List<Proc> list = null;
-
-        try {
-            proc = Runtime.getRuntime().exec("su -c top -d 1");
-            SystemClock.sleep(1200); // wait 1.2s
-            list = parserTop(proc.getInputStream());
-            return list;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        } finally {
-            if (list != null) {
-                for (int i=list.size()-1; i>=0; i--) {
-                    Proc info = list.get(i);
-                    if ("top".equals(info.getName())) {
-                        Log.i("top process killed: " + info.getPID());
-                        info.kill();
-                        list.remove(i);
-                    }
-                }
-            }
-        }
-    }
-
-    private static List<Proc> parserTop(InputStream istream) {
-        InputStreamReader isr = new InputStreamReader(istream);
-        BufferedReader br = new BufferedReader(isr);
-        List<Proc> list = new ArrayList<>();
-
-        try {
-            String line = br.readLine(); // drop 1st line
-            line = br.readLine(); // drop 2nd line
-            line = br.readLine(); // drop 3rd line
-            line = br.readLine(); // drop 4th line
-            line = br.readLine(); // drop 5th line
-            line = br.readLine(); // drop 6th line
-            line = br.readLine(); // drop 7th line
-
-            while ((line = br.readLine()) != null) {
-                if (line.isEmpty()) {
-                    break;
-                }
-
-                list.add(new Proc(line));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return list;
     }
 }

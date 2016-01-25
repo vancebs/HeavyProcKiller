@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -33,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case MSG_REFRESH_LIST_END:
-                    refreshListEnd((List<Proc>)msg.obj);
+                    refreshListEnd((List<Proc>) msg.obj);
                     break;
             }
 
@@ -64,23 +62,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                onItemClicked(position);
-            }
-        });
-        mListView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER && event.getAction() == KeyEvent.ACTION_UP) {
-                    onItemClicked((int)mListView.getSelectedItemId());
-                    return true;
-                }
-                return false;
-            }
-        });
-
         // init adapter
         String[] blackList = getResources().getStringArray(R.array.black_list);
         mAdapter = new ProcListAdapter(blackList);
@@ -95,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         int killedProc = 0;
         for (Proc proc : list) {
-            if (proc.kill()) {
+            if (Shell.kill(proc)) {
                 killedProc++;
             }
         }
@@ -108,14 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void onRefreshButtonClicked() {
         refreshList();
-    }
-
-    private void onItemClicked(int position) {
-        mAdapter.setItemChecked(position, !mAdapter.isItemChecked(position));
-    }
-
-    private void onListItemSelected(int position) {
-        mAdapter.setItemChecked(position, !mAdapter.isItemChecked(position));
     }
 
     private void refreshList() {
@@ -133,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                mHandler.obtainMessage(MSG_REFRESH_LIST_END, Proc.top()).sendToTarget();
+                mHandler.obtainMessage(MSG_REFRESH_LIST_END, Shell.top()).sendToTarget();
             }
         });
         thread.start();

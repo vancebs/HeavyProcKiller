@@ -1,9 +1,11 @@
 package com.hf.heavyprockiller;
 
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.List;
  * Process List Adapter
  */
 public class ProcListAdapter extends BaseAdapter {
-    private List<Item> mItemList = new ArrayList<>();
+    private final List<Item> mItemList = new ArrayList<>();
     private String[] mBlackList = null;
 
     private static class Item {
@@ -26,14 +28,33 @@ public class ProcListAdapter extends BaseAdapter {
             mIsChecked = checked;
         }
 
-        public void initCheckBox(CheckBox checkBox) {
+        public void initCheckBox(final CheckBox checkBox) {
             if (mProc == null) {
-                checkBox.setText("<Invalid Process>");
+                checkBox.setText(R.string.invalid_process);
                 checkBox.setChecked(false);
             } else {
                 checkBox.setText(String.format("% 3d%% %s", mProc.getPercent(), mProc.getName()));
                 checkBox.setChecked(mIsChecked);
             }
+
+            // Monitor DPAD_CENTER key
+            checkBox.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER && event.getAction() == KeyEvent.ACTION_UP) {
+                        checkBox.setChecked(!mIsChecked);
+                    }
+                    return false;
+                }
+            });
+
+            // Monitor check state changed
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mIsChecked = isChecked;
+                }
+            });
         }
     }
 
@@ -83,6 +104,7 @@ public class ProcListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    @SuppressWarnings("unused")
     public void setBlackList(String[] list) {
         synchronized (mItemList) {
             mBlackList = list;
@@ -110,17 +132,6 @@ public class ProcListAdapter extends BaseAdapter {
         return false;
     }
 
-    public void setItemChecked(int position, boolean checked) {
-        if (position < 0 || position >= mItemList.size()) {
-            return;
-        }
-
-        synchronized (mItemList) {
-            mItemList.get(position).mIsChecked = checked;
-        }
-        notifyDataSetInvalidated();
-    }
-
     public List<Proc> getCheckedList() {
         List<Proc> list = new ArrayList<>();
 
@@ -136,10 +147,7 @@ public class ProcListAdapter extends BaseAdapter {
     }
 
     public boolean isItemChecked(int position) {
-        if (position < 0 || position >= mItemList.size()) {
-            return false;
-        }
+        return position >= 0 && position < mItemList.size() && mItemList.get(position).mIsChecked;
 
-        return mItemList.get(position).mIsChecked;
     }
 }

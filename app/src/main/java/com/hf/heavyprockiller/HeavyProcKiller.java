@@ -16,7 +16,7 @@ public class HeavyProcKiller {
 
     public int killHeavyProc() {
         int count = 0;
-        List<Proc> list =  Proc.top();
+        List<Proc> list =  Shell.top();
         for (Proc info : list) {
             Log.i("checking: " + info);
             if (info.getPercent() < PERCENT_KILL) {
@@ -25,7 +25,7 @@ public class HeavyProcKiller {
             }
 
             if (isInBlackList(info.getName())) {
-                boolean result = info.kill();
+                boolean result = Shell.kill(info);
                 Log.i("kill proc: " + info.getName() + ", killed: " + result);
                 count ++;
             }
